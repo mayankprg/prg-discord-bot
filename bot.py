@@ -1,8 +1,9 @@
 import discord
 from discord.ext import commands
 from youtube import Youtube
-import time
 import os
+import asyncio
+
 
 yt = Youtube()
 
@@ -37,14 +38,6 @@ async def s(ctx, arg):
     await channel.connect()
 
 
-# @bot.command()
-# async def join(ctx):
-#     if not ctx.author.voice:
-#         await ctx.send(f"voice channel m toh ja chutiye!")
-#     else:
-#         await ctx.author.voice.channel.connect()
-
-
 @bot.command()
 async def dc(ctx):
     if ctx.voice_client and ctx.author.voice:
@@ -61,7 +54,7 @@ async def on_command_error(ctx, error):
 
 @bot.command(aliases=["p"])
 async def play(ctx, url):
-
+    video_data = yt.get_data(url)
     if not ctx.author.voice:
         await ctx.send(f"voice channel m toh ja chutiye!")
     else:
@@ -70,15 +63,20 @@ async def play(ctx, url):
         else:
             voice = ctx.voice_client
         voice.play(discord.FFmpegPCMAudio(
-            executable="ffmpeg", source=yt.get_audio_link(url)))
+            executable="ffmpeg", source=video_data["url"]))
+        await check(seconds=video_data["duration"], voice=voice)
 
-        while voice.is_playing():
-            time.sleep(.1)
+
+async def check(seconds, voice):
+    await asyncio.sleep(seconds + 30)
+    if not voice.is_playing():
         await voice.disconnect()
+    return
 
 
 @bot.command(aliases=["bha"])
 async def bhau(ctx, url="https://www.youtube.com/watch?v=8l45gbmoMTE"):
+    video_data = yt.get_data(url)
 
     if not ctx.author.voice:
         await ctx.send(f"voice channel m toh ja chutiye!")
@@ -89,11 +87,8 @@ async def bhau(ctx, url="https://www.youtube.com/watch?v=8l45gbmoMTE"):
         else:
             voice = ctx.voice_client
         voice.play(discord.FFmpegPCMAudio(
-            executable="ffmpeg", source=yt.get_audio_link(url)))
-
-        while voice.is_playing():
-            time.sleep(.1)
-        await voice.disconnect()
+            executable="ffmpeg", source=video_data["url"]))
+        await check(seconds=video_data["duration"], voice=voice)
 
 
 bot.run(os.getenv("token"))

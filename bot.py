@@ -91,4 +91,21 @@ async def bhau(ctx, url="https://www.youtube.com/watch?v=8l45gbmoMTE"):
         await check(seconds=video_data["duration"], voice=voice)
 
 
+@bot.command(aliases=["buss"])
+async def bussing(ctx, url="https://youtu.be/F70IpYWLQ9c"):
+    video_data = yt.get_data(url)
+
+    if not ctx.author.voice:
+        await ctx.send(f"voice channel m toh ja chutiye!")
+    else:
+
+        if not ctx.voice_client:
+            voice = await ctx.author.voice.channel.connect()
+        else:
+            voice = ctx.voice_client
+        voice.play(discord.FFmpegPCMAudio(
+            executable="ffmpeg", source=video_data["url"]))
+        await check(seconds=video_data["duration"], voice=voice)
+
+
 bot.run(os.getenv("token"))

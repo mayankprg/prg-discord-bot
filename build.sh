@@ -4,7 +4,7 @@ set -o errexit
 
 pip install -r requirements.txt
 
-sudo apt install ffmpeg
+apt install ffmpeg
 
 
 

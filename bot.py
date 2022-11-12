@@ -54,6 +54,8 @@ async def on_command_error(ctx, error):
 
 @bot.command(aliases=["p"])
 async def play(ctx, url):
+    if "shorts" in url:
+        url = url.replace("shorts/", "watch?v=")
     video_data = yt.get_data(url)
     if not ctx.author.voice:
         await ctx.send(f"voice channel m toh ja chutiye!")
@@ -93,6 +95,23 @@ async def bhau(ctx, url="https://www.youtube.com/watch?v=8l45gbmoMTE"):
 
 @bot.command(aliases=["buss"])
 async def bussing(ctx, url="https://youtu.be/F70IpYWLQ9c"):
+    video_data = yt.get_data(url)
+
+    if not ctx.author.voice:
+        await ctx.send(f"voice channel m toh ja chutiye!")
+    else:
+
+        if not ctx.voice_client:
+            voice = await ctx.author.voice.channel.connect()
+        else:
+            voice = ctx.voice_client
+        voice.play(discord.FFmpegPCMAudio(
+            executable="ffmpeg", source=video_data["url"]))
+        await check(seconds=video_data["duration"], voice=voice)
+
+
+@bot.command(aliases=["bsdk"])
+async def chal(ctx, url="https://www.youtube.com/watch?v=zh5_yrz9XOA"):
     video_data = yt.get_data(url)
 
     if not ctx.author.voice:
